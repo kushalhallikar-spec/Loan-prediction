@@ -1,7 +1,8 @@
-
+```python
 import streamlit as st
 import pickle
 import numpy as np
+import pandas as pd
 
 # -------------------- PAGE CONFIG --------------------
 st.set_page_config(page_title="Loan Predictor", page_icon="🏦", layout="wide")
@@ -10,7 +11,7 @@ st.set_page_config(page_title="Loan Predictor", page_icon="🏦", layout="wide")
 model = pickle.load(open("loan_model.pkl", "rb"))
 columns = pickle.load(open("columns.pkl", "rb"))
 
-# -------------------- CUSTOM CSS --------------------
+# -------------------- LIGHT UI BUTTON STYLE --------------------
 st.markdown("""
 <style>
 .stButton>button {
@@ -26,13 +27,12 @@ st.markdown("""
 
 # -------------------- HEADER --------------------
 st.markdown("<h1 style='text-align: center;'>🏦 Loan Approval Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size:18px;'>Smart ML-powered system to predict loan eligibility</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Predict loan eligibility using Machine Learning</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# -------------------- SIDEBAR --------------------
-st.sidebar.title("📊 Input Details")
-st.sidebar.markdown("Fill all fields to predict")
+# -------------------- SIDEBAR INPUT --------------------
+st.sidebar.title("📊 Applicant Details")
 
 gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 married = st.sidebar.selectbox("Married", ["Yes", "No"])
@@ -48,11 +48,10 @@ credit_history = st.sidebar.selectbox("Credit History (1 = Good)", [1, 0])
 
 predict_btn = st.sidebar.button("🚀 Predict")
 
-# -------------------- MAIN UI --------------------
+# -------------------- METRICS --------------------
 col1, col2, col3 = st.columns(3)
-
 col1.metric("Model Type", "ML Classifier")
-col2.metric("Accuracy", "80%+")  # update if you know exact
+col2.metric("Accuracy", "80%+")
 col3.metric("Status", "Ready")
 
 st.markdown("---")
@@ -78,6 +77,7 @@ if predict_btn:
         prediction = model.predict(data)[0]
         prob = model.predict_proba(data)[0][1]
 
+    # ---------------- RESULT ----------------
     st.markdown("## 📊 Prediction Result")
 
     if prediction == 1:
@@ -86,55 +86,59 @@ if predict_btn:
         st.error("❌ Loan Rejected")
 
     st.info(f"💡 Approval Probability: {prob*100:.2f}%")
-    # -------------------- EXPLANATION --------------------
-st.markdown("### 🧠 Why this prediction?")
 
-reasons = []
+    # ---------------- FEATURE IMPORTANCE ----------------
+    st.markdown("### 🔍 Model Insights")
 
-if credit_history == 0:
-    reasons.append("❌ Poor credit history")
+    try:
+        if hasattr(model, "coef_"):
+            importance = model.coef_[0]
+        elif hasattr(model, "feature_importances_"):
+            importance = model.feature_importances_
+        else:
+            raise Exception()
 
-if applicant_income < 2500:
-    reasons.append("💰 Low applicant income")
+        importance_df = pd.DataFrame({
+            "Feature": columns,
+            "Importance": importance
+        }).sort_values(by="Importance", ascending=False)
 
-if loan_amount > 300:
-    reasons.append("📉 High loan amount")
+        st.bar_chart(importance_df.set_index("Feature"))
 
-if self_employed == "No":
-    reasons.append("👤 Not self employed (less financial stability)")
+    except:
+        st.warning("Feature importance not available for this model")
 
-if dependents != "0":
-    reasons.append("👨‍👩‍👧 Has dependents (financial burden)")
+    # ---------------- EXPLANATION ----------------
+    st.markdown("### 🧠 Why this prediction?")
 
-# -------------------- SHOW RESULT --------------------
-if prediction == 0:
-    if reasons:
-        st.error("Loan rejected due to:")
-        for r in reasons:
-            st.write(r)
+    reasons = []
+
+    if credit_history == 0:
+        reasons.append("❌ Poor credit history")
+
+    if applicant_income < 2500:
+        reasons.append("💰 Low applicant income")
+
+    if loan_amount > 300:
+        reasons.append("📉 High loan amount")
+
+    if self_employed == "No":
+        reasons.append("👤 Not self employed")
+
+    if dependents != "0":
+        reasons.append("👨‍👩‍👧 Has dependents")
+
+    if prediction == 0:
+        if reasons:
+            st.error("Loan rejected due to:")
+            for r in reasons:
+                st.write(r)
+        else:
+            st.warning("Loan rejected due to multiple factors")
     else:
-        st.warning("Loan rejected due to multiple risk factors")
-else:
-    st.success("Loan approved due to strong financial profile ✅")
-
-    # -------------------- FEATURE IMPORTANCE --------------------
-st.markdown("### 🔍 Model Insights")
-
-try:
-    if hasattr(model, "coef_"):
-        importance = model.coef_[0]
-    elif hasattr(model, "feature_importances_"):
-        importance = model.feature_importances_
-    else:
-        raise Exception("No importance available")
-
-    for i, col in enumerate(columns):
-        st.write(f"{col}: {round(importance[i], 3)}")
-
-except:
-    st.warning("Feature importance not available for this model")
+        st.success("Loan approved due to strong financial profile ✅")
 
 # -------------------- FOOTER --------------------
 st.markdown("---")
-st.markdown("<p style='text-align: center;'>Made by Kushal 🚀 | ML Project</p>", unsafe_allow_html=True)
-
+st.markdown("<p style='text-align: center;'>Made by Kushal 🚀</p>", unsafe_allow_html=True)
+```
