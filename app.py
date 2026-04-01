@@ -13,21 +13,13 @@ columns = pickle.load(open("columns.pkl", "rb"))
 # -------------------- CUSTOM CSS --------------------
 st.markdown("""
 <style>
-.main {
-    background-color: #0E1117;
-}
-h1, h2, h3, h4 {
-    color: #FFFFFF;
-}
 .stButton>button {
     background-color: #4CAF50;
     color: white;
-    border-radius: 10px;
+    border-radius: 8px;
     height: 3em;
     width: 100%;
-}
-.stTextInput, .stNumberInput, .stSelectbox {
-    background-color: #262730;
+    font-weight: bold;
 }
 </style>
 """, unsafe_allow_html=True)
