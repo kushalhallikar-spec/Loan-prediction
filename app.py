@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import pickle
 import numpy as np
@@ -141,4 +141,4 @@ if predict_btn:
 # -------------------- FOOTER --------------------
 st.markdown("---")
 st.markdown("<p style='text-align: center;'>Made by Kushal 🚀</p>", unsafe_allow_html=True)
-```
+
