@@ -86,6 +86,36 @@ if predict_btn:
         st.error("❌ Loan Rejected")
 
     st.info(f"💡 Approval Probability: {prob*100:.2f}%")
+    # -------------------- EXPLANATION --------------------
+st.markdown("### 🧠 Why this prediction?")
+
+reasons = []
+
+if credit_history == 0:
+    reasons.append("❌ Poor credit history")
+
+if applicant_income < 2500:
+    reasons.append("💰 Low applicant income")
+
+if loan_amount > 300:
+    reasons.append("📉 High loan amount")
+
+if self_employed == "No":
+    reasons.append("👤 Not self employed (less financial stability)")
+
+if dependents != "0":
+    reasons.append("👨‍👩‍👧 Has dependents (financial burden)")
+
+# -------------------- SHOW RESULT --------------------
+if prediction == 0:
+    if reasons:
+        st.error("Loan rejected due to:")
+        for r in reasons:
+            st.write(r)
+    else:
+        st.warning("Loan rejected due to multiple risk factors")
+else:
+    st.success("Loan approved due to strong financial profile ✅")
 
     # -------------------- FEATURE IMPORTANCE --------------------
 st.markdown("### 🔍 Model Insights")
