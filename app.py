@@ -74,4 +74,4 @@ if st.button("🔍 Predict Loan Status"):
 # -------------------- FOOTER --------------------
 st.markdown("---")
 st.markdown("<p style='text-align: center;'>Made by Kushal 🚀</p>", unsafe_allow_html=True)
-```
+
