@@ -88,14 +88,21 @@ if predict_btn:
     st.info(f"💡 Approval Probability: {prob*100:.2f}%")
 
     # -------------------- FEATURE IMPORTANCE --------------------
-    st.markdown("### 🔍 Model Insights")
+st.markdown("### 🔍 Model Insights")
 
-    try:
+try:
+    if hasattr(model, "coef_"):
         importance = model.coef_[0]
-        for i, col in enumerate(columns):
-            st.write(f"{col}: {round(importance[i], 2)}")
-    except:
-        st.warning("Feature importance not available")
+    elif hasattr(model, "feature_importances_"):
+        importance = model.feature_importances_
+    else:
+        raise Exception("No importance available")
+
+    for i, col in enumerate(columns):
+        st.write(f"{col}: {round(importance[i], 3)}")
+
+except:
+    st.warning("Feature importance not available for this model")
 
 # -------------------- FOOTER --------------------
 st.markdown("---")
