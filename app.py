@@ -1,53 +1,77 @@
+```python
 import streamlit as st
-import numpy as np
 import pickle
+import numpy as np
 
-# Load model & columns
-model = pickle.load(open('loan_model.pkl', 'rb'))
-columns = pickle.load(open('columns.pkl', 'rb'))
+# -------------------- PAGE CONFIG --------------------
+st.set_page_config(page_title="Loan Predictor", page_icon="🏦", layout="centered")
 
-st.title("💳 Loan Approval Prediction")
+# -------------------- LOAD MODEL --------------------
+model = pickle.load(open("loan_model.pkl", "rb"))
+columns = pickle.load(open("columns.pkl", "rb"))
 
-# Inputs
-gender = st.selectbox("Gender (0=Female, 1=Male)", [0,1])
-married = st.selectbox("Married (0=No, 1=Yes)", [0,1])
-dependents = st.selectbox("Dependents", [0,1,2,3])
-education = st.selectbox("Education (0=Graduate, 1=Not Graduate)", [0,1])
-self_employed = st.selectbox("Self Employed (0=No, 1=Yes)", [0,1])
+# -------------------- TITLE --------------------
+st.markdown("<h1 style='text-align: center;'>🏦 Loan Approval Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Check your loan eligibility instantly</p>", unsafe_allow_html=True)
 
-app_income = st.number_input("Applicant Income")
-co_income = st.number_input("Coapplicant Income")
+st.markdown("---")
 
-loan_amount = st.number_input("Loan Amount")
-loan_term = st.number_input("Loan Term")
+# -------------------- INPUT SECTION --------------------
+st.subheader("📋 Enter Applicant Details")
 
-credit_history = st.selectbox("Credit History (0/1)", [0,1])
-property_area = st.selectbox("Property Area (0/1/2)", [0,1,2])
+col1, col2 = st.columns(2)
 
-# Prediction
-if st.button("Predict"):
+with col1:
+    gender = st.selectbox("Gender", ["Male", "Female"])
+    married = st.selectbox("Married", ["Yes", "No"])
+    education = st.selectbox("Education", ["Graduate", "Not Graduate"])
+    applicant_income = st.number_input("Applicant Income", min_value=0)
+
+with col2:
+    dependents = st.selectbox("Dependents", ["0", "1", "2", "3+"])
+    self_employed = st.selectbox("Self Employed", ["Yes", "No"])
+    loan_amount = st.number_input("Loan Amount", min_value=0)
+    credit_history = st.selectbox("Credit History (Good=1)", [1, 0])
+
+property_area = st.selectbox("Property Area", ["Urban", "Semiurban", "Rural"])
+
+st.markdown("---")
+
+# -------------------- PREDICTION --------------------
+if st.button("🔍 Predict Loan Status"):
     
+    # Example input (modify based on your encoding)
     input_dict = {
-        'Gender': gender,
-        'Married': married,
-        'Dependents': dependents,
-        'Education': education,
-        'Self_Employed': self_employed,
-        'ApplicantIncome': app_income,
-        'CoapplicantIncome': co_income,
-        'LoanAmount': loan_amount,
-        'Loan_Amount_Term': loan_term,
-        'Credit_History': credit_history,
-        'Property_Area': property_area
+        "Gender": 1 if gender == "Male" else 0,
+        "Married": 1 if married == "Yes" else 0,
+        "Education": 1 if education == "Graduate" else 0,
+        "Self_Employed": 1 if self_employed == "Yes" else 0,
+        "ApplicantIncome": applicant_income,
+        "LoanAmount": loan_amount,
+        "Credit_History": credit_history,
+        "Dependents": 0 if dependents == "0" else 1,
     }
 
-    # Match correct column order
-    data = [input_dict[col] for col in columns]
-    data = np.array([data])
+    # Convert to model input
+    data = [input_dict.get(col, 0) for col in columns]
+    data = np.array(data).reshape(1, -1)
 
-    prediction = model.predict(data)
+    # Loader
+    with st.spinner("Predicting..."):
+        prediction = model.predict(data)[0]
+        prob = model.predict_proba(data)[0][1]
 
-    if prediction[0] == 1:
-        st.success("Loan Approved ✅")
+    st.markdown("---")
+
+    # -------------------- OUTPUT --------------------
+    if prediction == 1:
+        st.success("✅ Loan Approved")
     else:
-        st.error("Loan Rejected ❌")
+        st.error("❌ Loan Rejected")
+
+    st.info(f"Approval Probability: {prob*100:.2f}%")
+
+# -------------------- FOOTER --------------------
+st.markdown("---")
+st.markdown("<p style='text-align: center;'>Made by Kushal 🚀</p>", unsafe_allow_html=True)
+```
