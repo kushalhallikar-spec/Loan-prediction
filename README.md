@@ -4,6 +4,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python)
 ![Streamlit](https://img.shields.io/badge/Deployed-Streamlit-red?style=flat-square&logo=streamlit)
+![Live](https://img.shields.io/badge/Live-App-brightgreen?style=flat-square)
 ![Scikit-learn](https://img.shields.io/badge/Scikit--learn-Classification-orange?style=flat-square)
 ![Notebook](https://img.shields.io/badge/Jupyter-Notebook-yellow?style=flat-square&logo=jupyter)
 
@@ -71,6 +72,12 @@ Streamlit Deployment
 - Scikit-learn (Logistic Regression, Random Forest)
 - Matplotlib, Seaborn
 - Streamlit (Deployment)
+
+---
+
+## 🌐 Live Demo
+
+**[Try it here → loan-prediction-irxbjse6kixyhxkmzbtnls.streamlit.app](https://loan-prediction-irxbjse6kixyhxkmzbtnls.streamlit.app/)**
 
 ---
 
